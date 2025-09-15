@@ -23,6 +23,17 @@ defmodule Betting.Accounts do
       nil
 
   """
+
+  # Fetch a user by id (raises if not found)
+  def get_user!(id), do: Repo.get!(User, id)
+
+  # Fetch a user by id (returns nil if not found)
+  def get_user(id), do: Repo.get(User, id)
+
+  # List all users ( for admin panel)
+  def list_users, do: Repo.all(User)
+
+
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
@@ -59,8 +70,6 @@ defmodule Betting.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
-
   ## User registration
 
   @doc """

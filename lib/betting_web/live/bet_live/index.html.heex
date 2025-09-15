@@ -1,0 +1,39 @@
+<.flash kind={:info} />
+<.flash kind={:error} />
+
+<h1 class="text-xl font-bold mb-4">My Bets</h1>
+
+<%= if @bets == [] do %>
+  <p>You have no bets yet.</p>
+<% else %>
+  <table class="table-auto border-collapse border border-gray-400">
+    <thead>
+      <tr>
+        <th class="border px-4 py-2">Game</th>
+        <th class="border px-4 py-2">Type</th>
+        <th class="border px-4 py-2">Stake</th>
+        <th class="border px-4 py-2">Odds</th>
+        <th class="border px-4 py-2">Status</th>
+        <th class="border px-4 py-2">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    <%= for bet <- @bets do %>
+      <tr>
+        <td class="border px-4 py-2">
+          <%= bet.game.home_team %> vs <%= bet.game.away_team %>
+        </td>
+        <td class="border px-4 py-2"><%= bet.bet_type %></td>
+        <td class="border px-4 py-2"><%= bet.stake %></td>
+        <td class="border px-4 py-2"><%= bet.odds %></td>
+        <td class="border px-4 py-2"><%= bet.status %></td>
+        <td class="border px-4 py-2">
+          <%= if bet.status == "pending" do %>
+            <button phx-click="cancel" phx-value-id={bet.id}>Cancel</button>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>

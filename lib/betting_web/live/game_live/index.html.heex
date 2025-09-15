@@ -1,0 +1,44 @@
+<.flash kind={:info} />
+<.flash kind={:error} />
+
+<h1 class="text-xl font-bold mb-4">Upcoming Games</h1>
+
+<%= if @games == [] do %>
+  <p>No games available</p>
+<% else %>
+  <table class="table-auto border-collapse border border-gray-400">
+    <thead>
+      <tr>
+        <th class="border px-4 py-2">Match</th>
+        <th class="border px-4 py-2">Starts</th>
+        <th class="border px-4 py-2">Odds</th>
+        <th class="border px-4 py-2">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    <%= for game <- @games do %>
+      <tr>
+        <td class="border px-4 py-2"><%= game.home_team %> vs <%= game.away_team %></td>
+        <td class="border px-4 py-2"><%= game.starts_at %></td>
+        <td class="border px-4 py-2">
+          H: <%= game.odds_home %> | D: <%= game.odds_draw %> | A: <%= game.odds_away %>
+        </td>
+        <td class="border px-4 py-2">
+         <.form for={%{}} phx-submit="bet">
+        <input type="hidden" name="game_id" value={game.id} />
+        <select name="bet_type">
+          <option value="home">Home</option>
+          <option value="draw">Draw</option>
+          <option value="away">Away</option>
+        </select>
+        <input type="number" name="stake" step="0.01" />
+        <button type="submit">Place Bet</button>
+      </.form>
+
+
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>

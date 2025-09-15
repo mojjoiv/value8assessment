@@ -12,6 +12,8 @@ defmodule Betting.Bets do
     |> Repo.all()
   end
 
+  def get_bet!(id), do: Repo.get!(Bet, id) |> Repo.preload(:game)
+
   def place_bet(%User{} = user, %Game{} = game, attrs) do
     odds =
       case attrs["bet_type"] do
