@@ -1,11 +1,22 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     Betting.Repo.insert!(%Betting.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+alias Betting.Repo
+alias Betting.Sports
+
+Sports.create_game(%{
+  sport: "football",
+  home_team: "Arsenal",
+  away_team: "Chelsea",
+  starts_at: DateTime.add(DateTime.utc_now(), 3600),
+  odds_home: Decimal.new("1.8"),
+  odds_draw: Decimal.new("3.2"),
+  odds_away: Decimal.new("2.5")
+})
+
+Sports.create_game(%{
+  sport: "football",
+  home_team: "Man City",
+  away_team: "Liverpool",
+  starts_at: DateTime.add(DateTime.utc_now(), 7200),
+  odds_home: Decimal.new("1.9"),
+  odds_draw: Decimal.new("3.0"),
+  odds_away: Decimal.new("2.8")
+})
