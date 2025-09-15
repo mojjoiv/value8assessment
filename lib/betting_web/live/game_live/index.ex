@@ -5,12 +5,23 @@ defmodule BettingWeb.GameLive.Index do
   alias Betting.Bets
   alias Betting.Accounts
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
+  user =
+    case Map.get(session, "user_token") do
+      nil -> nil
+      token ->
+  case Accounts.get_user_by_session_token(token) do
+    {user, _token_data} -> user
+    user -> user
+  end
+
+    end
+
     {:ok,
-     socket
-     |> assign(:games, Sports.list_upcoming_games())
-     |> assign(:current_user, nil)
-     |> assign(:bet_changeset, nil)}
+    socket
+    |> assign(:games, Sports.list_upcoming_games())
+    |> assign(:current_user, user)
+    |> assign(:bet_changeset, nil)}
   end
 
   def handle_params(_params, _url, socket) do
