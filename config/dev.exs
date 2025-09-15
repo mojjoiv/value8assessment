@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :betting_site, BettingSite.Repo,
+config :betting, Betting.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "betting_site_dev",
+  database: "betting_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,17 +16,17 @@ config :betting_site, BettingSite.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :betting_site, BettingSiteWeb.Endpoint,
+config :betting, BettingWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "0sFXDdrGnEqoJQQsVSxen5vYpUoyqLwGTVyh7VRRWMnAo/luY2ixPJXyNmynQr33",
+  secret_key_base: "RBxqVwZse+cmdSB2xnyaZuejcHw9GbQMBwfNy6J/XURdtFzrWa6iEuwWARPXONdn",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:betting_site, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:betting_site, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:betting, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:betting, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -53,18 +53,18 @@ config :betting_site, BettingSiteWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :betting_site, BettingSiteWeb.Endpoint,
+config :betting, BettingWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/betting_site_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
+      ~r"lib/betting_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :betting_site, dev_routes: true
+config :betting, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

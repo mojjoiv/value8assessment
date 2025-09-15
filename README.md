@@ -1,4 +1,4 @@
-# BettingSite
+# Betting
 
 To start your Phoenix server:
 

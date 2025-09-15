@@ -1,9 +1,9 @@
-defmodule BettingSite.MixProject do
+defmodule Betting.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :betting_site,
+      app: :betting,
       version: "0.1.0",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -20,7 +20,7 @@ defmodule BettingSite.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {BettingSite.Application, []},
+      mod: {Betting.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -40,6 +40,7 @@ defmodule BettingSite.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
@@ -82,10 +83,10 @@ defmodule BettingSite.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind betting_site", "esbuild betting_site"],
+      "assets.build": ["compile", "tailwind betting", "esbuild betting"],
       "assets.deploy": [
-        "tailwind betting_site --minify",
-        "esbuild betting_site --minify",
+        "tailwind betting --minify",
+        "esbuild betting --minify",
         "phx.digest"
       ],
       precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
