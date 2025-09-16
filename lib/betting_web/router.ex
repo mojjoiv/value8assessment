@@ -23,6 +23,7 @@ defmodule BettingWeb.Router do
     get "/", PageController, :home
     live "/games", GameLive.Index, :index
     live "/my-bets", BetLive.Index, :index
+    live "/admin/users", AdminLive.Index, :index
 
   end
 
