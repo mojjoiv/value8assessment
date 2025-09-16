@@ -84,8 +84,14 @@ defmodule BettingWeb do
 
       # HTML escaping functionality
       import Phoenix.HTML
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
+      
       # Core UI components
       import BettingWeb.CoreComponents
+
+      # Error helpers
+      import BettingWeb.ErrorHelpers
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS

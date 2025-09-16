@@ -1,0 +1,95 @@
+<h1 class="text-xl font-bold mb-4">Manage Games</h1>
+
+<.flash kind={:info} />
+<.flash kind={:error} />
+
+<table class="table-auto border-collapse border border-gray-400 w-full mb-4">
+  <thead>
+    <tr>
+      <th class="border px-4 py-2">Home Team</th>
+      <th class="border px-4 py-2">Away Team</th>
+      <th class="border px-4 py-2">Odds (Home)</th>
+      <th class="border px-4 py-2">Odds (Draw)</th>
+      <th class="border px-4 py-2">Odds (Away)</th>
+      <th class="border px-4 py-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for game <- @games do %>
+      <tr>
+        <td class="border px-4 py-2"><%= game.home_team %></td>
+        <td class="border px-4 py-2"><%= game.away_team %></td>
+        <td class="border px-4 py-2"><%= game.odds_home %></td>
+        <td class="border px-4 py-2"><%= game.odds_draw %></td>
+        <td class="border px-4 py-2"><%= game.odds_away %></td>
+        <td class="border px-4 py-2">
+          <button phx-click="edit_game" phx-value-id={game.id} class="text-blue-600 underline">Edit</button>
+          <button phx-click="delete_game" phx-value-id={game.id} class="text-red-600 underline ml-2">Delete</button>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h2 class="font-semibold mb-2">
+  <%= if @editing do %>
+    Editing Game: <%= @editing.home_team %> vs <%= @editing.away_team %>
+  <% else %>
+    Add New Game
+  <% end %>
+</h2>
+
+<.form for={@form} phx-submit="save_game">
+  <%= if @editing do %>
+    <%= hidden_input @form, :id, value: @editing.id %>
+  <% end %>
+
+  <div class="mb-2">
+    <label>Home Team</label>
+    <%= text_input @form, :home_team, class: "border p-1 w-full" %>
+    <%= error_tag @form, :home_team %>
+  </div>
+
+  <div class="mb-2">
+    <label>Away Team</label>
+    <%= text_input @form, :away_team, class: "border p-1 w-full" %>
+    <%= error_tag @form, :away_team %>
+  </div>
+
+  <div class="mb-2">
+    <label>Odds (Home)</label>
+    <%= number_input @form, :odds_home, step: "0.01", class: "border p-1 w-full" %>
+    <%= error_tag @form, :odds_home %>
+  </div>
+
+  <div class="mb-2">
+    <label>Odds (Draw)</label>
+    <%= number_input @form, :odds_draw, step: "0.01", class: "border p-1 w-full" %>
+    <%= error_tag @form, :odds_draw %>
+  </div>
+
+  <div class="mb-2">
+    <label>Odds (Away)</label>
+    <%= number_input @form, :odds_away, step: "0.01", class: "border p-1 w-full" %>
+    <%= error_tag @form, :odds_away %>
+  </div>
+
+  <div class="mb-2">
+    <label>Start Time</label>
+    <%= datetime_local_input @form, :starts_at, class: "border p-1 w-full" %>
+    <%= error_tag @form, :starts_at %>
+  </div>
+
+
+  <div class="flex gap-2">
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+      <%= if @editing, do: "Update Game", else: "Save Game" %>
+    </button>
+
+    <%= if @editing do %>
+      <button type="button" phx-click="cancel_edit" class="bg-gray-500 text-white px-4 py-2 rounded">
+        Cancel
+      </button>
+    <% end %>
+  </div>
+</.form>

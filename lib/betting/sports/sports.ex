@@ -5,24 +5,36 @@ defmodule Betting.Sports do
 
   def list_upcoming_games do
     now = DateTime.utc_now()
+
     Game
     |> where([g], g.starts_at > ^now)
     |> order_by([g], asc: g.starts_at)
     |> Repo.all()
   end
 
+  def list_games do
+    Repo.all(Game)
+  end
+
   def get_game!(id), do: Repo.get!(Game, id)
 
-  def create_game(attrs) do
-  %Game{}
-  |> Game.changeset(attrs)
-  |> Repo.insert()
-end
+  def create_game(attrs \\ %{}) do
+    %Game{}
+    |> Game.changeset(attrs)
+    |> Repo.insert()
+  end
 
-def update_game(%Game{} = game, attrs) do
-  game
-  |> Game.changeset(attrs)
-  |> Repo.update()
-end
+  def update_game(%Game{} = game, attrs) do
+    game
+    |> Game.changeset(attrs)
+    |> Repo.update()
+  end
 
+  def delete_game(%Game{} = game) do
+    Repo.delete(game)
+  end
+
+  def change_game(%Game{} = game, attrs \\ %{}) do
+    Game.changeset(game, attrs)
+  end
 end
