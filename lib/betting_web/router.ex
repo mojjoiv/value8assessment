@@ -17,31 +17,52 @@ defmodule BettingWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :require_frontend do
+    plug BettingWeb.Plugs.Authorize, :require_frontend
+  end
+
+  pipeline :require_admin do
+    plug BettingWeb.Plugs.Authorize, :require_admin
+  end
+
+  pipeline :require_superuser do
+    plug BettingWeb.Plugs.Authorize, :require_superuser
+  end
+
+  ## ---------- Public ----------
   scope "/", BettingWeb do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/games", GameLive.Index, :index
-    live "/my-bets", BetLive.Index, :index
-    live "/admin/users", AdminLive.Index, :index
-    live "/admin/profit-report", AdminLive.ProfitReport, :index
-    live "/admin/games", AdminLive.GameLive, :index
-
-
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BettingWeb do
-  #   pipe_through :api
-  # end
+  ## ---------- Frontend user routes ----------
+  scope "/", BettingWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_frontend]
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
+    live "/games", GameLive.Index, :index
+    live "/my-bets", BetLive.Index, :index
+  end
+
+  ## ---------- Admin routes ----------
+  scope "/admin", BettingWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_admin]
+
+    live "/games", AdminLive.GameLive, :index
+    live "/users", AdminLive.Index, :index
+    live "/profit-report", AdminLive.ProfitReport, :index
+  end
+
+  ## ---------- Superuser routes ----------
+  scope "/superadmin", BettingWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_superuser]
+
+    live "/users", SuperAdminLive.Index, :index
+    live "/roles", SuperAdminLive.Roles, :index
+  end
+
+  ## ---------- Dev only ----------
   if Application.compile_env(:betting, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
@@ -52,8 +73,7 @@ defmodule BettingWeb.Router do
     end
   end
 
-  ## Authentication routes
-
+  ## ---------- Authentication ----------
   scope "/", BettingWeb do
     pipe_through [:browser, :require_authenticated_user]
 

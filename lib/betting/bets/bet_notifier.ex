@@ -33,7 +33,7 @@ defmodule Betting.Bets.BetNotifier do
       "<p>Thanks for playing — the Betting team.</p>"
 
     new()
-    |> to({name, user.email})
+    |> to({name, user.first_name})
     |> from({ "noreply@betting.local"})
     |> subject(subject)
     |> html_body(html)
