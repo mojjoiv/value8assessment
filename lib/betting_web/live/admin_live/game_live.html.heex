@@ -26,6 +26,41 @@
           <button phx-click="edit_game" phx-value-id={game.id} class="text-blue-600 underline">Edit</button>
           <button phx-click="delete_game" phx-value-id={game.id} class="text-red-600 underline ml-2">Delete</button>
         </td>
+        <td class="border px-4 py-2">
+  <button phx-click="edit_game" phx-value-id={game.id} class="text-blue-600 underline">Edit</button>
+  <button phx-click="delete_game" phx-value-id={game.id} class="text-red-600 underline ml-2">Delete</button>
+
+  <!-- quick settle controls (only show to superuser/admin optionally) -->
+  <div class="mt-2 space-x-2">
+    <button
+      phx-click="settle_game"
+      phx-value-id={game.id}
+      phx-value-result="home"
+      class="text-sm px-2 py-1 bg-green-100 rounded"
+    >
+      Home win
+    </button>
+
+    <button
+      phx-click="settle_game"
+      phx-value-id={game.id}
+      phx-value-result="draw"
+      class="text-sm px-2 py-1 bg-yellow-100 rounded"
+    >
+      Draw
+    </button>
+
+    <button
+      phx-click="settle_game"
+      phx-value-id={game.id}
+      phx-value-result="away"
+      class="text-sm px-2 py-1 bg-red-100 rounded"
+    >
+      Away win
+    </button>
+  </div>
+</td>
+
       </tr>
     <% end %>
   </tbody>

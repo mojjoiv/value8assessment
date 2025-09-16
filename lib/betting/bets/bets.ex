@@ -4,6 +4,7 @@ defmodule Betting.Bets do
   alias Betting.Bets.Bet
   alias Betting.Sports.Game
   alias Betting.Accounts.User
+  alias Decimal
 
   def list_user_bets(user_id) do
     Bet
@@ -109,6 +110,46 @@ defmodule Betting.Bets do
       case status do
         "won" -> %{status: "won", payout: Decimal.mult(bet.stake, bet.odds)}
         _ -> %{status: status, payout: nil}
+      end
+
+    bet
+    |> Ecto.Changeset.change(changes)
+    |> Repo.update()
+  end
+
+  # List bets for a given game id (preload user + game)
+  def list_bets_for_game(game_id) do
+    Bet
+    |> where([b], b.game_id == ^game_id)
+    |> preload([:user, :game])
+    |> Repo.all()
+  end
+
+  @doc """
+  Settle a single bet. outcome is :won or :lost (atom).
+  This will update the bet.status and optionally payout if schema has :payout.
+  """
+  def settle_bet(%Bet{} = bet, :won) do
+    payout = Decimal.mult(bet.stake, bet.odds)
+
+    changes =
+      if Map.has_key?(bet, :payout) do
+        %{status: "won", payout: payout}
+      else
+        %{status: "won"}
+      end
+
+    bet
+    |> Ecto.Changeset.change(changes)
+    |> Repo.update()
+  end
+
+  def settle_bet(%Bet{} = bet, :lost) do
+    changes =
+      if Map.has_key?(bet, :payout) do
+        %{status: "lost", payout: Decimal.new(0)}
+      else
+        %{status: "lost"}
       end
 
     bet
