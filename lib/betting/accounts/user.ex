@@ -28,15 +28,16 @@ defmodule Betting.Accounts.User do
   Allows optional profile fields (first_name, last_name, msisdn).
   """
   def registration_changeset(user, attrs, opts \\ []) do
-    user
-    |> cast(attrs, [:first_name, :last_name, :msisdn, :email, :password])
-    |> validate_required([:email, :password])
-    |> validate_length(:first_name, max: 80)
-    |> validate_length(:last_name, max: 80)
-    |> validate_length(:msisdn, max: 32)
-    |> validate_email(opts)
-    |> validate_password(opts)
-  end
+  user
+  |> cast(attrs, [:email, :password, :first_name, :last_name, :msisdn])
+  |> validate_required([:email, :password, :first_name, :last_name, :msisdn])
+  |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/, message: "must have @ and no spaces")
+  |> validate_length(:email, max: 160)
+  |> validate_length(:password, min: 12, max: 72)
+  |> unique_constraint(:email)
+  |> maybe_hash_password(opts)
+end
+
 
   @doc """
   A profile changeset for updating name/msisdn (not for password/email).

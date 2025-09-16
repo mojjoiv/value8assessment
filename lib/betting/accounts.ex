@@ -90,6 +90,10 @@ defmodule Betting.Accounts do
     |> Repo.insert()
   end
 
+  def change_user_registration(user, attrs \\ %{}) do
+    User.registration_changeset(user, attrs)
+  end
+
   ##make a reusable function for admin
   # Promote a user to admin (role + superuser flag)
 def make_admin(%User{} = user) do
