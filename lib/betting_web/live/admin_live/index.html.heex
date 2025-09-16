@@ -19,13 +19,29 @@
       <td class="border px-4 py-2"><%= user.first_name %></td>
       <td class="border px-4 py-2"><%= user.role %></td>
       <td class="border px-4 py-2">
+  <td class="border px-4 py-2">
   <button phx-click="toggle_bets" phx-value-id={user.id} class="text-blue-600 underline">
     <%= if MapSet.member?(@expanded_users, user.id), do: "Hide Bets", else: "View Bets" %>
   </button>
 
   <button phx-click="soft_delete_user" phx-value-id={user.id} class="text-red-600 underline ml-2">
-    Delete
+    Soft Delete
   </button>
+
+  <td class="border px-4 py-2">
+  <%= if user.role == "admin" do %>
+    <button phx-click="revoke_admin" phx-value-id={user.id} class="text-red-600 underline">
+      Revoke Admin
+    </button>
+  <% else %>
+    <button phx-click="grant_admin" phx-value-id={user.id} class="text-green-600 underline">
+      Grant Admin
+    </button>
+  <% end %>
+</td>
+
+</td>
+
 </td>
 
     </tr>

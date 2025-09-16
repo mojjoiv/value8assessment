@@ -24,6 +24,7 @@ defmodule BettingWeb.Router do
     live "/games", GameLive.Index, :index
     live "/my-bets", BetLive.Index, :index
     live "/admin/users", AdminLive.Index, :index
+    live "/admin/profit-report", AdminLive.ProfitReport, :index
 
   end
 

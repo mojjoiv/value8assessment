@@ -59,4 +59,60 @@ defmodule Betting.Bets do
       net: Decimal.sub(total_won, total_wagered)
     }
   end
+
+   def profit_report do
+    from(g in Betting.Sports.Game,
+      left_join: b in Betting.Bets.Bet,
+      on: b.game_id == g.id,
+      group_by: [g.id],
+      select: %{
+        game_id: g.id,
+        home_team: g.home_team,
+        away_team: g.away_team,
+        total_wagered: coalesce(sum(b.stake), 0),
+        total_payout:
+          coalesce(
+            sum(
+              fragment(
+                "CASE WHEN ? = 'won' THEN ? * ? ELSE 0 END",
+                b.status,
+                b.stake,
+                b.odds
+              )
+            ),
+            0
+          ),
+        profit:
+          coalesce(sum(b.stake), 0) -
+            coalesce(
+              sum(
+                fragment(
+                  "CASE WHEN ? = 'won' THEN ? * ? ELSE 0 END",
+                  b.status,
+                  b.stake,
+                  b.odds
+                )
+              ),
+              0
+            )
+      }
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Update bet status (e.g. "won", "lost", "cancelled").
+  If status is "won", automatically calculates payout = stake * odds.
+  """
+   def update_bet_status(%Bet{} = bet, status) when status in ["won", "lost", "cancelled"] do
+    changes =
+      case status do
+        "won" -> %{status: "won", payout: Decimal.mult(bet.stake, bet.odds)}
+        _ -> %{status: status, payout: nil}
+      end
+
+    bet
+    |> Ecto.Changeset.change(changes)
+    |> Repo.update()
+  end
 end

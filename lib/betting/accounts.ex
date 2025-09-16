@@ -31,7 +31,11 @@ defmodule Betting.Accounts do
   def get_user(id), do: Repo.get(User, id)
 
   # List all users ( for admin panel)
-  def list_users, do: Repo.all(User)
+  def list_users do
+  from(u in User, where: is_nil(u.deleted_at))
+  |> Repo.all()
+end
+
 
 
   def get_user_by_email(email) when is_binary(email) do
@@ -94,33 +98,38 @@ defmodule Betting.Accounts do
     User.registration_changeset(user, attrs)
   end
 
-  ##make a reusable function for admin
-  # Promote a user to admin (role + superuser flag)
+  ##making a reusable function for admin
 def make_admin(%User{} = user) do
   user
   |> User.admin_changeset(%{role: "admin", is_superuser: true})
   |> Repo.update()
 end
 
-# Revoke admin (set back to frontend)
 def revoke_admin(%User{} = user) do
   user
   |> User.admin_changeset(%{role: "frontend", is_superuser: false})
   |> Repo.update()
 end
 
-def soft_delete_user(user) do
-  Betting.Repo.transaction(fn ->
+def update_user_role(%User{} = user, role) when role in ["frontend", "admin", "superuser"] do
+  user
+  |> Ecto.Changeset.change(%{role: role})
+  |> Repo.update()
+end
+
+def soft_delete_user(%User{} = user) do
+  Repo.transaction(fn ->
     {:ok, user} =
       user
-      |> Betting.Accounts.User.soft_delete_changeset()
-      |> Betting.Repo.update()
+      |> User.soft_delete_changeset()
+      |> Repo.update()
 
     from(b in Betting.Bets.Bet, where: b.user_id == ^user.id)
-    |> Betting.Repo.update_all(set: [deleted_at: DateTime.utc_now()])
+    |> Repo.update_all(set: [deleted_at: DateTime.utc_now()])
 
-    user
+    {:ok, user}
   end)
+
 end
 
   ## Settings

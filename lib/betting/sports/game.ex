@@ -13,6 +13,8 @@ defmodule Betting.Sports.Game do
     field :odds_draw, :decimal
     field :odds_away, :decimal
 
+    has_many :bets, Betting.Bets.Bet
+
     timestamps()
   end
 

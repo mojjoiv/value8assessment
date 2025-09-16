@@ -9,6 +9,8 @@ defmodule Betting.Bets.Bet do
     field :status, :string, default: "pending"
     field :deleted_at, :utc_datetime
 
+    field :payout, :decimal 
+
     belongs_to :user, Betting.Accounts.User
     belongs_to :game, Betting.Sports.Game
 
