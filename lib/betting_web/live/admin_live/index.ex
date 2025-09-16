@@ -28,8 +28,10 @@ defmodule BettingWeb.AdminLive.Index do
         {nil, nil} ->
           bets = Bets.list_user_bets(user_id)
           summary = Bets.user_summary(user_id)
-          {Map.put(socket.assigns.bets, user_id, bets),
-           Map.put(socket.assigns.summaries, user_id, summary)}
+          {
+            Map.put(socket.assigns.bets, user_id, bets),
+            Map.put(socket.assigns.summaries, user_id, summary)
+          }
 
         _ ->
           {socket.assigns.bets, socket.assigns.summaries}
@@ -40,5 +42,29 @@ defmodule BettingWeb.AdminLive.Index do
       |> assign(:expanded_users, expanded)
       |> assign(:bets, bets)
       |> assign(:summaries, summaries)}
+  end
+
+  def handle_event("mark_won", %{"id" => id}, socket) do
+    bet = Bets.get_bet!(id)
+    {:ok, _} = Bets.update_bet_status(bet, "won")
+
+    refresh_admin(socket, bet.user_id)
+  end
+
+  def handle_event("mark_lost", %{"id" => id}, socket) do
+    bet = Bets.get_bet!(id)
+    {:ok, _} = Bets.update_bet_status(bet, "lost")
+
+    refresh_admin(socket, bet.user_id)
+  end
+
+  defp refresh_admin(socket, user_id) do
+    bets = Bets.list_user_bets(user_id)
+    summary = Bets.user_summary(user_id)
+
+    {:noreply,
+      socket
+      |> assign(:bets, Map.put(socket.assigns.bets, user_id, bets))
+      |> assign(:summaries, Map.put(socket.assigns.summaries, user_id, summary))}
   end
 end
