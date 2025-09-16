@@ -19,10 +19,15 @@
       <td class="border px-4 py-2"><%= user.first_name %></td>
       <td class="border px-4 py-2"><%= user.role %></td>
       <td class="border px-4 py-2">
-        <button phx-click="toggle_bets" phx-value-id={user.id} class="text-blue-600 underline">
-          <%= if MapSet.member?(@expanded_users, user.id), do: "Hide Bets", else: "View Bets" %>
-        </button>
-      </td>
+  <button phx-click="toggle_bets" phx-value-id={user.id} class="text-blue-600 underline">
+    <%= if MapSet.member?(@expanded_users, user.id), do: "Hide Bets", else: "View Bets" %>
+  </button>
+
+  <button phx-click="soft_delete_user" phx-value-id={user.id} class="text-red-600 underline ml-2">
+    Delete
+  </button>
+</td>
+
     </tr>
 
     <%= if MapSet.member?(@expanded_users, user.id) do %>

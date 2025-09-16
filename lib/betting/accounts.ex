@@ -109,6 +109,19 @@ def revoke_admin(%User{} = user) do
   |> Repo.update()
 end
 
+def soft_delete_user(user) do
+  Betting.Repo.transaction(fn ->
+    {:ok, user} =
+      user
+      |> Betting.Accounts.User.soft_delete_changeset()
+      |> Betting.Repo.update()
+
+    from(b in Betting.Bets.Bet, where: b.user_id == ^user.id)
+    |> Betting.Repo.update_all(set: [deleted_at: DateTime.utc_now()])
+
+    user
+  end)
+end
 
   ## Settings
 

@@ -67,4 +67,15 @@ defmodule BettingWeb.AdminLive.Index do
       |> assign(:bets, Map.put(socket.assigns.bets, user_id, bets))
       |> assign(:summaries, Map.put(socket.assigns.summaries, user_id, summary))}
   end
+
+  def handle_event("soft_delete_user", %{"id" => id}, socket) do
+  user = Accounts.get_user!(id)
+  {:ok, _} = Accounts.soft_delete_user(user)
+
+  {:noreply,
+   socket
+   |> put_flash(:info, "User #{user.email} has been soft deleted.")
+   |> assign(:users, Accounts.list_users())}
+end
+
 end

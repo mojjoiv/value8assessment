@@ -8,6 +8,7 @@ defmodule Betting.Bets do
   def list_user_bets(user_id) do
     Bet
     |> where([b], b.user_id == ^user_id)
+    |> where([b], is_nil(b.deleted_at))
     |> preload([:game])
     |> Repo.all()
   end
