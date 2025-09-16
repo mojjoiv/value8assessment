@@ -6,7 +6,7 @@
 <%= if @bets == [] do %>
   <p>You have no bets yet.</p>
 <% else %>
-  <table class="table-auto border-collapse border border-gray-400">
+  <table class="table-auto border-collapse border border-gray-400 w-full">
     <thead>
       <tr>
         <th class="border px-4 py-2">Game</th>
@@ -18,22 +18,33 @@
       </tr>
     </thead>
     <tbody>
-    <%= for bet <- @bets do %>
-      <tr>
-        <td class="border px-4 py-2">
-          <%= bet.game.home_team %> vs <%= bet.game.away_team %>
-        </td>
-        <td class="border px-4 py-2"><%= bet.bet_type %></td>
-        <td class="border px-4 py-2"><%= bet.stake %></td>
-        <td class="border px-4 py-2"><%= bet.odds %></td>
-        <td class="border px-4 py-2"><%= bet.status %></td>
-        <td class="border px-4 py-2">
-          <%= if bet.status == "pending" do %>
-            <button phx-click="cancel" phx-value-id={bet.id}>Cancel</button>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
+      <%= for bet <- @bets do %>
+        <tr>
+          <td class="border px-4 py-2">
+            <%= bet.game.home_team %> vs <%= bet.game.away_team %>
+          </td>
+          <td class="border px-4 py-2"><%= bet.bet_type %></td>
+          <td class="border px-4 py-2"><%= bet.stake %></td>
+          <td class="border px-4 py-2"><%= bet.odds %></td>
+          <td class="border px-4 py-2"><%= bet.status %></td>
+          <td class="border px-4 py-2">
+            <%= if bet.status == "pending" do %>
+              <button phx-click="cancel" phx-value-id={bet.id} class="text-red-600 underline">
+                Cancel
+              </button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
+
+  <div class="mt-6 p-4 bg-gray-100 rounded">
+    <h2 class="text-lg font-semibold mb-2">Summary</h2>
+    <ul class="space-y-1">
+      <li><strong>Total Wagered:</strong> <%= @summary.total_wagered %></li>
+      <li><strong>Total Won:</strong> <%= @summary.total_won %></li>
+      <li><strong>Net:</strong> <%= @summary.net %></li>
+    </ul>
+  </div>
 <% end %>

@@ -36,4 +36,26 @@ defmodule Betting.Bets do
     |> Ecto.Changeset.change(status: "cancelled")
     |> Repo.update()
   end
+
+  def user_summary(user_id) do
+    bets = list_user_bets(user_id)
+
+    total_wagered =
+      Enum.reduce(bets, Decimal.new(0), fn b, acc -> Decimal.add(acc, b.stake) end)
+
+    total_won =
+      Enum.reduce(bets, Decimal.new(0), fn b, acc ->
+        if b.status == "won" do
+          Decimal.add(acc, b.payout || Decimal.new(0))
+        else
+          acc
+        end
+      end)
+
+    %{
+      total_wagered: total_wagered,
+      total_won: total_won,
+      net: Decimal.sub(total_won, total_wagered)
+    }
+  end
 end
