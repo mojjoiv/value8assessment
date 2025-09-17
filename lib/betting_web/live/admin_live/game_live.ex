@@ -32,6 +32,7 @@ defmodule BettingWeb.AdminLive.GameLive do
     end
   end
 
+  # Update existing game
   def handle_event("save_game", %{"game" => game_params}, %{assigns: %{editing: game}} = socket) do
     case Sports.update_game(game, game_params) do
       {:ok, _game} ->
@@ -50,6 +51,7 @@ defmodule BettingWeb.AdminLive.GameLive do
     end
   end
 
+  # Load game for editing
   def handle_event("edit_game", %{"id" => id}, socket) do
     game = Sports.get_game!(id)
 
@@ -59,6 +61,7 @@ defmodule BettingWeb.AdminLive.GameLive do
      |> assign(:form, to_form(Sports.change_game(game)))}
   end
 
+  # Cancel editing
   def handle_event("cancel_edit", _params, socket) do
     {:noreply,
      socket
@@ -66,6 +69,7 @@ defmodule BettingWeb.AdminLive.GameLive do
      |> assign(:form, to_form(Sports.change_game(%Game{})))}
   end
 
+  # Delete game
   def handle_event("delete_game", %{"id" => id}, socket) do
     game = Sports.get_game!(id)
     {:ok, _} = Sports.delete_game(game)
@@ -77,39 +81,5 @@ defmodule BettingWeb.AdminLive.GameLive do
      socket
      |> put_flash(:info, "Game deleted successfully")
      |> assign(:games, games)}
-  end
-
-  @impl true
-  def mount(_params, session, socket) do
-    # if you have LiveHelpers.assign_current_user(session) you can call it here
-    socket =
-      socket
-      |> assign(:games, Sports.list_games())
-      |> assign(:form, to_form(Sports.change_game(%Betting.Sports.Game{})))
-      |> assign(:editing, nil)
-
-    {:ok, socket}
-  end
-
-  # existing create/save/edit/delete handlers... (keep your existing code)
-
-  # handle settling the game result
-  @impl true
-  def handle_event("settle_game", %{"id" => id, "result" => result}, socket) do
-    game = Sports.get_game!(id)
-
-    case Sports.settle_game(game, result) do
-      {:ok, _game} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Game settled — users notified.")
-         |> assign(:games, Sports.list_games())}
-
-      {:error, _} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Failed to settle game.")
-         |> assign(:games, Sports.list_games())}
-    end
   end
 end

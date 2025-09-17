@@ -2,34 +2,37 @@ defmodule BettingWeb.Plugs.Authorize do
   import Plug.Conn
   import Phoenix.Controller
 
-  alias BettingWeb.Router.Helpers, as: Routes
+  alias BettingWeb.Router
 
-  def init(role), do: role
+  use BettingWeb, :verified_routes
 
-  def call(conn, required_role) do
-    current_user = conn.assigns[:current_user]
+  def init(opts), do: opts
 
-    cond do
-      current_user == nil ->
-        conn
-        |> put_flash(:error, "You must log in first.")
-        |> redirect(to: Routes.user_login_path(conn, :new))
-        |> halt()
-
-      has_role?(current_user, required_role) ->
-        conn
-
-      true ->
-        conn
-        |> put_flash(:error, "You do not have permission to access this page.")
-        |> redirect(to: "/")
-        |> halt()
+  def call(conn, :require_admin) do
+    case conn.assigns[:current_scope] do
+      %{user: %{role: "admin"}} -> conn
+      %{user: %{is_superuser: true}} -> conn
+      _ -> redirect_to_login(conn)
     end
   end
 
-  # Roles
-  defp has_role?(%{role: "superuser"}, _), do: true
-  defp has_role?(%{role: "admin"}, :require_admin), do: true
-  defp has_role?(%{role: "frontend"}, :require_frontend), do: true
-  defp has_role?(_, _), do: false
+  def call(conn, :require_superuser) do
+    case conn.assigns[:current_scope] do
+      %{user: %{is_superuser: true}} -> conn
+      _ -> redirect_to_login(conn)
+    end
+  end
+
+  def call(conn, :require_frontend) do
+    case conn.assigns[:current_scope] do
+      %{user: %{role: "frontend"}} -> conn
+      _ -> redirect_to_login(conn)
+    end
+  end
+
+  defp redirect_to_login(conn) do
+    conn
+    |> redirect(to: ~p"/users/log-in")
+    |> halt()
+  end
 end

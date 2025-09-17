@@ -2,6 +2,7 @@ defmodule BettingWeb.Router do
   use BettingWeb, :router
 
   import BettingWeb.UserAuth
+  alias BettingWeb.Plugs.Authorize   # 👈 add this line
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -18,50 +19,53 @@ defmodule BettingWeb.Router do
   end
 
   pipeline :require_frontend do
-    plug BettingWeb.Plugs.Authorize, :require_frontend
+    plug Authorize, :require_frontend
   end
 
   pipeline :require_admin do
-    plug BettingWeb.Plugs.Authorize, :require_admin
+    plug Authorize, :require_admin
   end
 
   pipeline :require_superuser do
-    plug BettingWeb.Plugs.Authorize, :require_superuser
+    plug Authorize, :require_superuser
   end
 
-  ## ---------- Public ----------
+  # --------------------
+  # Frontend user routes
+  # --------------------
   scope "/", BettingWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_frontend]
 
     get "/", PageController, :home
-  end
-
-  ## ---------- Frontend user routes ----------
-  scope "/", BettingWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_frontend]
-
     live "/games", GameLive.Index, :index
     live "/my-bets", BetLive.Index, :index
   end
 
-  ## ---------- Admin routes ----------
+  # --------------------
+  # Admin routes
+  # --------------------
   scope "/admin", BettingWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_admin]
+    pipe_through [:browser, :require_admin]
 
-    live "/games", AdminLive.GameLive, :index
     live "/users", AdminLive.Index, :index
     live "/profit-report", AdminLive.ProfitReport, :index
+    live "/games", AdminLive.GameLive, :index
   end
 
-  ## ---------- Superuser routes ----------
-  scope "/superadmin", BettingWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_superuser]
+  # --------------------
+  # Superuser-only routes
+  # --------------------
+  scope "/su", BettingWeb do
+    pipe_through [:browser, :require_superuser]
 
-    live "/users", SuperAdminLive.Index, :index
-    live "/roles", SuperAdminLive.Roles, :index
+    # endpoints to promote/demote users
+    post "/users/:id/grant-admin", AdminController, :grant_admin
+    post "/users/:id/revoke-admin", AdminController, :revoke_admin
   end
 
-  ## ---------- Dev only ----------
+  # --------------------
+  # Dev routes
+  # --------------------
   if Application.compile_env(:betting, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
@@ -73,7 +77,9 @@ defmodule BettingWeb.Router do
     end
   end
 
-  ## ---------- Authentication ----------
+  # --------------------
+  # Authenticated user routes
+  # --------------------
   scope "/", BettingWeb do
     pipe_through [:browser, :require_authenticated_user]
 
@@ -86,6 +92,9 @@ defmodule BettingWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
+  # --------------------
+  # Public routes (registration, login)
+  # --------------------
   scope "/", BettingWeb do
     pipe_through [:browser]
 
